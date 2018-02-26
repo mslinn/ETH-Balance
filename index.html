@@ -1,41 +1,90 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <title>ETH Balance Fetcher</title>
     <meta charset="UTF-8">
-    <script type="text/javascript" src="./web3.min.js"></script>
-    <script type="text/javascript">
-        window.addEventListener('load', function () {
-            if (typeof web3 !== 'undefined') {
-                console.log('Web3 Detected! ' + web3.currentProvider.constructor.name)
-                window.web3 = new Web3(web3.currentProvider);
-            } else {
-                console.log('No Web3 Detected... using HTTP Provider')
-                window.web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/<APIKEY>"));
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/ethereum/web3.js/develop/dist/web3.min.js"></script>
+    <script>
+        function web3Connect() {
+          if (typeof web3 !== 'undefined') {
+              console.log('Web3 Detected! ' + web3.currentProvider.constructor.name)
+              return new Web3(web3.currentProvider);
+          } else {
+              //console.log('No web3 detected... trying Infura HTTP provider');
+              var infuraApiKey = $("#infuraApiKey").val();
+              if (infuraApiKey === '') {
+                $("#error").html("Error: No Infura API key was provided.");
+                return undefined;
+              } else {
+                var web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/" + infuraApiKey));
+                if ((typeof web3 === 'undefined') || (web3.currentProvider.isConnected() === false)) {
+                   web3 = undefined;
+                  $("#error").html("Invalid Infura key");
+                }
+                return web3;
+              }
+          }
+        }
+
+        const promisify = (inner) =>
+            new Promise((resolve, reject) =>
+                inner((err, res) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(res);
+                    }
+                })
+            );
+
+        // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
+        async function getBalance() {
+          $("#error").html("");
+          $("#output").html("");
+          window.web3 = web3Connect();
+          if (typeof window.web3 !== 'undefined') {
+            var address = $("#address").html();
+            var wei = promisify(cb => window.web3.eth.getBalance(address, cb));
+            try {
+                // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await
+                var balance = window.web3.fromWei(await wei, 'ether'); // throws error if wei is undefined
+                $("#output").html(balance + " ETH");
+                $("#error").html("");
+            } catch (error) {
+                $("#output").html("");
+                $("#error").html(error);
             }
-        })
-        function getBalance() {
+          }
+        }
+
+        // Same code using callbacks
+        /*function getBalance() {
             var address, wei, balance
             address = document.getElementById("address").value
             try {
                 web3.eth.getBalance(address, function (error, wei) {
                     if (!error) {
                         var balance = web3.fromWei(wei, 'ether');
-                        document.getElementById("output").innerHTML = balance + " ETH";
+                        $("output").val(balance + " ETH");
                     }
                 });
             } catch (err) {
-                document.getElementById("output").innerHTML = err;
+                $("#output").val(err);
             }
-        }
+        }*/
     </script>
 </head>
 <body>
     <h1>ETH Balance Fetcher</h1>
-    <p>Enter your Ethereum Address:</p>
+    <p>Infura API key (not required if an Ethereum client is running locally):</p>
+    <input type="text" size="50" id="infuraApiKey" />
+
+    <p>Obtain balance of this Ethereum address:</p>
     <input type="text" size="50" id="address" />
     <button type="button" onClick="getBalance();">Get Balance</button>
-    <br />
-    <br />
-    <div id="output"></div>
+
+    <div id="output" style="margin-top: 1em;"></div>
+    <div id="error" style="color: red;margin-top: 1em;"></div>
 </body>
 </html>

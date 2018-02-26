@@ -1,6 +1,10 @@
 # ETH-Balance
-### Ethereum and Web3.js “Hello World”: Get the ETH Balance of an Ethereum Address
-#### Using just 41 lines of HTML + JS, we create a Web3.JS application which can get the ETH Balance of an Ethereum Address
+
+*Modified to use promises and jquery.*
+
+Ethereum and Web3.js “Hello World”: Get the ETH Balance of an Ethereum Address
+
+This Web3.JS application obtains the ETH Balance of an Ethereum Address.
 
 Read my Blog Post here: http://shawntabrizi.com/crypto/ethereum-web3-js-hello-world-get-eth-balance-ethereum-address/
 
