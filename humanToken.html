@@ -1,0 +1,21 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script type="text/javascript" src="./web3.min.js"></script>
+  <script type="text/javascript" src="./human_standard_token_abi.js"></script>
+  <script>
+    var web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/<APIKEY>"));
+
+    address = "0x0e2e75240c69495d2b9e768b548db381de2142b9" //From Etherscan
+    contractAddress = "0xd26114cd6EE289AccF82350c8d8487fedB8A0C07" //OMG
+    contractABI = human_standard_token_abi
+
+    tokenContract = web3.eth.contract(contractABI).at(contractAddress)
+
+    console.log(tokenContract.balanceOf(address).toNumber())
+  </script>
+</head>
+<body>
+  <p>Check the console (F12)</p>
+</body>
+</html>

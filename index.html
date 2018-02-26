@@ -3,8 +3,9 @@
 <head>
   <title>ETH Balance Fetcher</title>
     <meta charset="UTF-8">
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script type="text/javascript" src="https://cdn.rawgit.com/ethereum/web3.js/develop/dist/web3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.rawgit.com/ethereum/web3.js/develop/dist/web3.min.js"></script>
+    <script src="https://cdn.rawgit.com/shawntabrizi/ERC-20-Token-Balance/master/human_standard_token_abi.js"></script>
     <script>
         function web3Connect() {
           if (typeof web3 !== 'undefined') {
@@ -73,16 +74,40 @@
                 $("#output").val(err);
             }
         }*/
+
+        async function getTokenBalance() {
+          window.web3 = web3Connect();
+          var address = $("#address2").val(); // account address From Etherscan
+          var contractAddress = $("#contractAddress").val(); // OMG contract address
+          var tokenContract = window.web3.eth.contract(human_standard_token_abi).at(contractAddress);
+          $("#output").html(tokenContract.balanceOf(address).toNumber());
+        }
     </script>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      div {
+        margin-bottom: 1em;
+      }
+    </style>
 </head>
 <body>
     <h1>ETH Balance Fetcher</h1>
-    <p>Infura API key (not required if an Ethereum client is running locally):</p>
-    <input type="text" size="50" id="infuraApiKey" />
+    <div>Infura API key (not required if an Ethereum client is running locally):<br/>
+      <input type="text" size="50" id="infuraApiKey" />
+    </div>
 
-    <p>Obtain balance of this Ethereum address:</p>
-    <input type="text" size="50" id="address" />
-    <button type="button" onClick="getBalance();">Get Balance</button>
+    <div>Obtain balance of this Ethereum address:<br/>
+      <input type="text" size="50" id="address" />
+      <button type="button" onClick="getBalance();">Get Balance</button>
+    </div>
+
+    <div>Obtain balance of this Ethereum contract address using the human standard token interface:<br/>
+      <input type="text" size="50" id="address2" value="0x0e2e75240c69495d2b9e768b548db381de2142b9" />
+      <input type="text" size="50" id="contractAddress" value="0xd26114cd6EE289AccF82350c8d8487fedB8A0C07" />
+      <button type="button" onClick="getTokenBalance();">Get Token Balance</button>
+    </div>
 
     <div id="output" style="margin-top: 1em;"></div>
     <div id="error" style="color: red;margin-top: 1em;"></div>
